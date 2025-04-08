@@ -12,8 +12,9 @@
             android:id="@+id/HukamNamaBT"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ajj da HukamNama"/>
-
+            android:text="Ajj da HukamNama"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="190dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

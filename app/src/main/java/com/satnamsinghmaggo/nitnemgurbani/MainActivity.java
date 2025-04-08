@@ -21,12 +21,12 @@ public class MainActivity extends AppCompatActivity {
         //EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         button = findViewById(R.id.HukamNamaBT);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), Acitvity_HukamNama.class);
                 startActivity(intent);
-
             }
         });
 
