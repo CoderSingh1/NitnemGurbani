@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
+
+
 }
+
 
 android {
     namespace = "com.satnamsinghmaggo.nitnemgurbani"
@@ -40,4 +43,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation(libs.android.pdf.viewer)
+
 }
+
+
