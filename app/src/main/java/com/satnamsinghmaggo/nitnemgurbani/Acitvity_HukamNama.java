@@ -8,14 +8,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.github.barteksc.pdfviewer.PDFView;
+
 public class Acitvity_HukamNama extends AppCompatActivity {
 
+    PDFView pdfview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_acitvity_hukam_nama);
 
+        pdfview = findViewById(R.id.pdfview);
+        pdfview.fromAsset("hukamnama.pdf").load();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
