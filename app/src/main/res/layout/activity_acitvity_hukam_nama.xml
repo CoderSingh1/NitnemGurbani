@@ -7,17 +7,14 @@
     android:layout_height="match_parent"
     tools:context=".Acitvity_HukamNama">
 
-    <ScrollView
+
+    <com.github.barteksc.pdfviewer.PDFView
+        android:id="@+id/pdfview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-
-
-    </ScrollView>
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
