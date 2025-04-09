@@ -1,10 +1,14 @@
 package com.satnamsinghmaggo.nitnemgurbani;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,10 +36,17 @@ public class Acitvity_HukamNama extends AppCompatActivity {
 
     private static final String TAG = "Acitvity_HukamNama";
     PDFView pdfview;
-    ProgressBar progressBar;
+
     LottieAnimationView lottieLoader;
-    FrameLayout progressOverlay;
+    ImageView playButton, skipNext, skipPrev,pause;
+
     String pdfURL = "https://hs.sgpc.net/pdfdownload.php?id=261";
+    String audioUrl = "https://hs.sgpc.net/audiohukamnama/audio-67f5b8ec202106.27442149.mp3";
+    SeekBar seekBar;
+    MediaPlayer mediaPlayer;
+    Handler handler = new Handler();
+    Runnable updateSeekBar;
+    private boolean isPlaying = false;
     private static final OkHttpClient client = new OkHttpClient();
 
     @Override
@@ -45,19 +56,69 @@ public class Acitvity_HukamNama extends AppCompatActivity {
 
         pdfview = findViewById(R.id.pdfview);
         lottieLoader = findViewById(R.id.lottieLoader);
+        seekBar = findViewById(R.id.seekBar);
+        playButton = findViewById(R.id.play);
 
        // progressBar = findViewById(R.id.progressBar);
         // Set the visibility of the progressBar.bringToFront();
         lottieLoader.bringToFront();
+        mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(audioUrl);
+            mediaPlayer.prepareAsync(); // Prepare asynchronously to not block the UI
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Audio file error", Toast.LENGTH_SHORT).show();
+        }
+        mediaPlayer.setOnPreparedListener(mp -> {
+            seekBar.setMax(mp.getDuration());
+
+            updateSeekBar = new Runnable() {
+                @Override
+                public void run() {
+                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                        seekBar.setProgress(mediaPlayer.getCurrentPosition());
+                        handler.postDelayed(this, 500);
+                    }
+                }
+            };
+        });
+        playButton.setOnClickListener(v -> {
+            if (!mediaPlayer.isPlaying()) {
+                mediaPlayer.start();
+                isPlaying = true;
+                playButton.setImageResource(R.drawable.pause);
+                handler.post(updateSeekBar);
+                Toast.makeText(this, "Playing Audio", Toast.LENGTH_SHORT).show();
+            } else {
+                mediaPlayer.pause();
+                isPlaying = false;
+                playButton.setImageResource(R.drawable.play);
+                handler.removeCallbacks(updateSeekBar);
+                Toast.makeText(this, "Paused", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser && mediaPlayer != null) {
+                    mediaPlayer.seekTo(progress);
+                }
+            }
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
 
 
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+                    Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                    v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                    return insets;
+                });
+
+
         //progressBar.setVisibility(ProgressBar.VISIBLE);
         lottieLoader.setVisibility(View.VISIBLE);
         lottieLoader.playAnimation();
@@ -112,5 +173,17 @@ public class Acitvity_HukamNama extends AppCompatActivity {
                 }
             }
         });
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+            }
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+        handler.removeCallbacks(updateSeekBar);
     }
 }
