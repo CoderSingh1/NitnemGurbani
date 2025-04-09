@@ -53,7 +53,7 @@ public class Paath_acitvity extends AppCompatActivity {
         // Set play/pause functionality
         playButton.setOnClickListener(v -> {
             isPlaying = !isPlaying;
-            //playButton.setImageResource(isPlaying ? R.drawable.pause : R.drawable.play);
+            playButton.setImageResource(isPlaying ? R.drawable.pause : R.drawable.play);
 
             if (isPlaying) {
                 startAutoScroll();
