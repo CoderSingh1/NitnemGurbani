@@ -56,8 +56,8 @@
             android:src="@drawable/skipnext" />
     </LinearLayout>
 
-    <com.google.android.material.slider.Slider
-        android:id="@+id/slider"
+    <SeekBar
+        android:id="@+id/seekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
