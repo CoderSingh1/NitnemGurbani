@@ -3,6 +3,7 @@ package com.satnamsinghmaggo.nitnemgurbani;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -12,6 +13,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.airbnb.lottie.LottieAnimationView;
+import com.airbnb.lottie.LottieDrawable;
 import com.github.barteksc.pdfviewer.PDFView;
 
 import java.io.File;
@@ -30,6 +33,8 @@ public class Acitvity_HukamNama extends AppCompatActivity {
     private static final String TAG = "Acitvity_HukamNama";
     PDFView pdfview;
     ProgressBar progressBar;
+    LottieAnimationView lottieLoader;
+    FrameLayout progressOverlay;
     String pdfURL = "https://hs.sgpc.net/pdfdownload.php?id=261";
     private static final OkHttpClient client = new OkHttpClient();
 
@@ -38,20 +43,28 @@ public class Acitvity_HukamNama extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acitvity_hukam_nama);
 
-
         pdfview = findViewById(R.id.pdfview);
-        progressBar = findViewById(R.id.progressBar);
-        progressBar.bringToFront();
+        lottieLoader = findViewById(R.id.lottieLoader);
+
+       // progressBar = findViewById(R.id.progressBar);
+        // Set the visibility of the progressBar.bringToFront();
+        lottieLoader.bringToFront();
+
+
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        progressBar.setVisibility(ProgressBar.VISIBLE);
+        //progressBar.setVisibility(ProgressBar.VISIBLE);
+        lottieLoader.setVisibility(View.VISIBLE);
+        lottieLoader.playAnimation();
         downloadAndDisplayPdf(pdfURL);
         Log.d(TAG, "Views initialized successfully");
     }
+
 
     private void downloadAndDisplayPdf(String url) {
         Request request = new Request.Builder().url(url).build();
@@ -64,7 +77,8 @@ public class Acitvity_HukamNama extends AppCompatActivity {
                 Log.d(TAG, "Downloading failed");
                 runOnUiThread(() -> {
                     Toast.makeText(Acitvity_HukamNama.this, "Failed to download PDF", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
+                    //progressBar.setVisibility(View.GONE);
+                    lottieLoader.setVisibility(View.GONE);
                 });
             }
 
@@ -84,14 +98,16 @@ public class Acitvity_HukamNama extends AppCompatActivity {
                         outputStream.flush();
                         runOnUiThread(() -> {
                             pdfview.fromFile(pdfFile).load();
-                            progressBar.setVisibility(View.GONE);
+                           // progressBar.setVisibility(View.GONE);
+                            lottieLoader.setVisibility(View.GONE);
                         });
                         Log.d(TAG, "PDF downloaded and loaded successfully");
                     }
                 } else {
                     runOnUiThread(() -> {
                         Toast.makeText(Acitvity_HukamNama.this, "Failed to download PDF", Toast.LENGTH_SHORT).show();
-                        progressBar.setVisibility(View.GONE);
+                       // progressBar.setVisibility(View.GONE);
+                        lottieLoader.setVisibility(View.GONE);
                     });
                 }
             }

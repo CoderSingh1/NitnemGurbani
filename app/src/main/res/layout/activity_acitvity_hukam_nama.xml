@@ -8,18 +8,22 @@
     android:background="#E4A137"
     tools:context=".Acitvity_HukamNama">
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="visible"
-        android:indeterminateTint="@color/black"
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieLoader"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="Animation1.json"
+        app:lottie_loop="true"
+        app:lottie_renderMode="hardware" />
+
+
 
     <com.github.barteksc.pdfviewer.PDFView
         android:id="@+id/pdfview"
