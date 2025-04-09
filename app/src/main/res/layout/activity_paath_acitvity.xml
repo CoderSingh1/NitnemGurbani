@@ -8,6 +8,7 @@
     android:background="#FFC780"
     tools:context=".Paath_acitvity">
 
+
     <ImageView
         android:id="@+id/JapjiIMG"
         android:layout_width="match_parent"
@@ -16,6 +17,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <com.github.barteksc.pdfviewer.PDFView
+        android:id="@+id/pdfview1"
+        android:layout_width="350dp"
+        android:layout_height="450dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
