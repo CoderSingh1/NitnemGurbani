@@ -25,11 +25,6 @@
 
 
 
-
-
-
-
-
     <com.github.barteksc.pdfviewer.PDFView
         android:id="@+id/pdfview"
         android:layout_width="match_parent"
@@ -39,12 +34,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-<!--    <Button-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Date"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/pdfview"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent" />-->
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
