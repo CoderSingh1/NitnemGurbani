@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
-            android:src="@drawable/play" />
+            android:src="@drawable/play"/>
 
         <ImageView
             android:id="@+id/skipnext"
@@ -54,7 +54,6 @@
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/skipnext" />
-
     </LinearLayout>
 
     <com.google.android.material.slider.Slider
