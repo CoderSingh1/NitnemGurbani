@@ -46,9 +46,6 @@ dependencies {
     implementation("com.github.barteksc:android-pdf-viewer:3.2.0-beta.1")
     implementation ("com.squareup.okhttp3:okhttp:4.9.3")
 
-
-
-
 }
 
 
