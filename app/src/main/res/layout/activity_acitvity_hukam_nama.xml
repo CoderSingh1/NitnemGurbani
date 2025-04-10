@@ -23,13 +23,12 @@
         app:lottie_loop="true"
         app:lottie_renderMode="hardware" />
 
-
-
     <com.github.barteksc.pdfviewer.PDFView
         android:id="@+id/pdfview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
