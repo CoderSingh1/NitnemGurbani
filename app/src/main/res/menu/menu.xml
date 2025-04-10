@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Share -->
+    <item
+        android:id="@+id/action_share"
+        android:title="Share"
+        android:icon="@android:drawable/ic_menu_share" />
+
+    <!-- About Us -->
+    <item
+        android:id="@+id/action_about"
+        android:title="About Us"
+        android:icon="@android:drawable/ic_menu_info_details" />
+
+    <!-- Mode -->
+    <item
+        android:id="@+id/dark_mode"
+        android:title="Dark Mode"
+        android:icon="@android:drawable/ic_menu_info_details" />
+
+</menu>
