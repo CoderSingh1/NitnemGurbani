@@ -10,20 +10,21 @@
 
         <ImageView
             android:id="@+id/HukamNamaIMG"
-            android:layout_width="407dp"
-            android:layout_height="214dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginTop="16dp"
             android:src="@drawable/hukamnama"
+            app:layout_constraintBottom_toTopOf="@+id/PaathIMG"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/PaathIMG"
-            android:layout_width="407dp"
-            android:layout_height="214dp"
-            android:layout_marginTop="256dp"
+            android:layout_width="0dp"
+            android:layout_height="217dp"
             android:src="@drawable/stocks"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
