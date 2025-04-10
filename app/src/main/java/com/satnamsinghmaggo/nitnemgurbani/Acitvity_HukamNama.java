@@ -61,6 +61,8 @@ public class Acitvity_HukamNama extends AppCompatActivity {
         lottieLoader = findViewById(R.id.lottieLoader);
         seekBar = findViewById(R.id.seekBar);
         playButton = findViewById(R.id.play);
+        skipNext = findViewById(R.id.skipnext);
+        skipPrev = findViewById(R.id.skipprev);
 
        // progressBar = findViewById(R.id.progressBar);
         // Set the visibility of the progressBar.bringToFront();
@@ -203,6 +205,33 @@ public class Acitvity_HukamNama extends AppCompatActivity {
                 Toast.makeText(this, "Paused", Toast.LENGTH_SHORT).show();
             }
         });
+
+        skipNext.setOnClickListener(v -> {
+            if (mediaPlayer != null) {
+                int currentPosition = mediaPlayer.getCurrentPosition();
+                int duration = mediaPlayer.getDuration();
+                int forwardTime = 5000;
+
+                if (currentPosition + forwardTime <= duration) {
+                    mediaPlayer.seekTo(currentPosition + forwardTime);
+                } else {
+                    mediaPlayer.seekTo(duration); // go to end if within last 5s
+                }
+            }
+        });
+
+        skipPrev.setOnClickListener(v -> {
+                    if (mediaPlayer != null) {
+                        int currentPosition = mediaPlayer.getCurrentPosition();
+                        int backwardTime = 5000;
+
+                        if (currentPosition - backwardTime >= 0) {
+                            mediaPlayer.seekTo(currentPosition - backwardTime);
+                        } else {
+                            mediaPlayer.seekTo(0); // go to start if less than 5s
+                        }
+                    }
+                });
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
