@@ -1,5 +1,6 @@
 package com.satnamsinghmaggo.nitnemgurbani;
 
+import android.animation.Animator;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -44,11 +46,11 @@ public class Acitvity_HukamNama extends AppCompatActivity {
     LottieAnimationView lottieLoader;
     ImageView playButton, skipNext, skipPrev,pause;
 
-    //String audioUrl = "https://hs.sgpc.net/audiohukamnama/audio-67f5b8ec202106.27442149.mp3";
     SeekBar seekBar;
     MediaPlayer mediaPlayer;
     Handler handler = new Handler();
     Runnable updateSeekBar;
+    LinearLayout mediaPlayerLayout;
     private boolean isPlaying = false;
     private static final OkHttpClient client = new OkHttpClient();
 
@@ -63,13 +65,37 @@ public class Acitvity_HukamNama extends AppCompatActivity {
         playButton = findViewById(R.id.play);
         skipNext = findViewById(R.id.skipnext);
         skipPrev = findViewById(R.id.skipprev);
+        mediaPlayerLayout = findViewById(R.id.linearLayout1);
 
        // progressBar = findViewById(R.id.progressBar);
         // Set the visibility of the progressBar.bringToFront();
+        lottieLoader.setVisibility(View.VISIBLE);
+        lottieLoader.setRepeatCount(0);
         lottieLoader.bringToFront();
+        lottieLoader.playAnimation();
 
+        lottieLoader.addAnimatorListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(@NonNull Animator animation) {
+                Log.d("LottieDebug", "Animation started");
+            }
 
+            @Override
+            public void onAnimationEnd(@NonNull Animator animation) {
+                Log.d("LottieDebug", "Animation ended");
 
+                lottieLoader.setVisibility(View.GONE); // Hide loader
+
+                mediaPlayerLayout.setVisibility(View.VISIBLE);
+                seekBar.setAlpha(0f);
+                seekBar.animate().alpha(1f).setDuration(800).start();
+                mediaPlayerLayout.setAlpha(0f);
+                mediaPlayerLayout.animate().alpha(1f).setDuration(800).start();
+            }
+
+            @Override public void onAnimationCancel(@NonNull Animator animation) {}
+            @Override public void onAnimationRepeat(@NonNull Animator animation) {}
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
                     Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -79,8 +105,7 @@ public class Acitvity_HukamNama extends AppCompatActivity {
 
 
         //progressBar.setVisibility(ProgressBar.VISIBLE);
-        lottieLoader.setVisibility(View.VISIBLE);
-        lottieLoader.playAnimation();
+
         fetchDailyPdfLink();
         fetchMp3AndPlay();
         //downloadAndDisplayPdf(pdfURL);
@@ -101,6 +126,7 @@ public class Acitvity_HukamNama extends AppCompatActivity {
                     Toast.makeText(Acitvity_HukamNama.this, "Failed to download PDF", Toast.LENGTH_SHORT).show();
                     //progressBar.setVisibility(View.GONE);
                     lottieLoader.setVisibility(View.GONE);
+
                 });
             }
 
