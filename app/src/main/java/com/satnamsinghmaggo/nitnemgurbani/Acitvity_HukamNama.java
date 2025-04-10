@@ -21,6 +21,10 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.github.barteksc.pdfviewer.PDFView;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,8 +44,7 @@ public class Acitvity_HukamNama extends AppCompatActivity {
     LottieAnimationView lottieLoader;
     ImageView playButton, skipNext, skipPrev,pause;
 
-    String pdfURL = "https://hs.sgpc.net/pdfdownload.php?id=261";
-    String audioUrl = "https://hs.sgpc.net/audiohukamnama/audio-67f5b8ec202106.27442149.mp3";
+    //String audioUrl = "https://hs.sgpc.net/audiohukamnama/audio-67f5b8ec202106.27442149.mp3";
     SeekBar seekBar;
     MediaPlayer mediaPlayer;
     Handler handler = new Handler();
@@ -62,52 +65,6 @@ public class Acitvity_HukamNama extends AppCompatActivity {
        // progressBar = findViewById(R.id.progressBar);
         // Set the visibility of the progressBar.bringToFront();
         lottieLoader.bringToFront();
-        mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(audioUrl);
-            mediaPlayer.prepareAsync(); // Prepare asynchronously to not block the UI
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Audio file error", Toast.LENGTH_SHORT).show();
-        }
-        mediaPlayer.setOnPreparedListener(mp -> {
-            seekBar.setMax(mp.getDuration());
-
-            updateSeekBar = new Runnable() {
-                @Override
-                public void run() {
-                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                        seekBar.setProgress(mediaPlayer.getCurrentPosition());
-                        handler.postDelayed(this, 500);
-                    }
-                }
-            };
-        });
-        playButton.setOnClickListener(v -> {
-            if (!mediaPlayer.isPlaying()) {
-                mediaPlayer.start();
-                isPlaying = true;
-                playButton.setImageResource(R.drawable.pause);
-                handler.post(updateSeekBar);
-                Toast.makeText(this, "Playing Audio", Toast.LENGTH_SHORT).show();
-            } else {
-                mediaPlayer.pause();
-                isPlaying = false;
-                playButton.setImageResource(R.drawable.play);
-                handler.removeCallbacks(updateSeekBar);
-                Toast.makeText(this, "Paused", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser && mediaPlayer != null) {
-                    mediaPlayer.seekTo(progress);
-                }
-            }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
 
 
 
@@ -122,7 +79,9 @@ public class Acitvity_HukamNama extends AppCompatActivity {
         //progressBar.setVisibility(ProgressBar.VISIBLE);
         lottieLoader.setVisibility(View.VISIBLE);
         lottieLoader.playAnimation();
-        downloadAndDisplayPdf(pdfURL);
+        fetchDailyPdfLink();
+        fetchMp3AndPlay();
+        //downloadAndDisplayPdf(pdfURL);
         Log.d(TAG, "Views initialized successfully");
     }
 
@@ -185,5 +144,99 @@ public class Acitvity_HukamNama extends AppCompatActivity {
             mediaPlayer = null;
         }
         handler.removeCallbacks(updateSeekBar);
+    }
+    private void fetchDailyPdfLink() {
+        new Thread(() -> {
+            try {
+                Document doc = Jsoup.connect("https://hs.sgpc.net/").get();
+                Element link = doc.select("div.pdf-section a.pdf-button[href]").first(); // Or a more specific selector
+                if (link != null) {
+                    String relativeUrl = link.attr("href");
+                    String pdfUrl = "https://hs.sgpc.net/" + relativeUrl;
+                    runOnUiThread(() -> downloadAndDisplayPdf(pdfUrl));
+
+                } else {
+                    runOnUiThread(() ->
+                            Toast.makeText(this, "No PDF link found", Toast.LENGTH_SHORT).show());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Error fetching PDF link", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+    private void mp3AudioPlayer(String audioUrl){
+        mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(audioUrl);
+            mediaPlayer.prepareAsync(); // Prepare asynchronously to not block the UI
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Audio file error", Toast.LENGTH_SHORT).show();
+        }
+        mediaPlayer.setOnPreparedListener(mp -> {
+            seekBar.setMax(mp.getDuration());
+
+            updateSeekBar = new Runnable() {
+                @Override
+                public void run() {
+                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                        seekBar.setProgress(mediaPlayer.getCurrentPosition());
+                        handler.postDelayed(this, 500);
+                    }
+                }
+            };
+        });
+        playButton.setOnClickListener(v -> {
+            if (!mediaPlayer.isPlaying()) {
+                mediaPlayer.start();
+                isPlaying = true;
+                playButton.setImageResource(R.drawable.pause);
+                handler.post(updateSeekBar);
+                Toast.makeText(this, "Playing Audio", Toast.LENGTH_SHORT).show();
+            } else {
+                mediaPlayer.pause();
+                isPlaying = false;
+                playButton.setImageResource(R.drawable.play);
+                handler.removeCallbacks(updateSeekBar);
+                Toast.makeText(this, "Paused", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser && mediaPlayer != null) {
+                    mediaPlayer.seekTo(progress);
+                }
+            }
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
+
+    }
+    private void fetchMp3AndPlay() {
+        new Thread(() -> {
+            try {
+                // Replace with your real Hukamnama page URL
+                Document doc = Jsoup.connect("https://hs.sgpc.net/").get();
+
+                // Find the <audio> tag and get the 'src' attribute
+                Element audioElement = doc.select("div.audio-card audio.audio-player[src]").first();
+
+                if (audioElement != null) {
+                    String audioUrl = audioElement.attr("src");
+
+                    runOnUiThread(() -> mp3AudioPlayer(audioUrl));
+                } else {
+                    runOnUiThread(() -> Toast.makeText(this, "Audio link not found", Toast.LENGTH_SHORT).show());
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Error fetching audio", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
     }
 }

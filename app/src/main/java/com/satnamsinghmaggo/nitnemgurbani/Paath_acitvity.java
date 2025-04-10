@@ -16,7 +16,13 @@ import androidx.core.view.WindowInsetsCompat;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.google.android.material.slider.Slider;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Paath_acitvity extends AppCompatActivity {
 
@@ -25,7 +31,6 @@ public class Paath_acitvity extends AppCompatActivity {
     SeekBar seekBar;
     Handler handler = new Handler();
     Runnable updateSeekBar;
-    MediaPlayer mediaPlayer;
     String audioUrl = "https://hs.sgpc.net/audiohukamnama/audio-67f5b8ec202106.27442149.mp3";
 
     private boolean isPlaying = false;
@@ -43,77 +48,7 @@ public class Paath_acitvity extends AppCompatActivity {
         seekBar = findViewById(R.id.seekBar);
         //pause = findViewById(R.drawable.pause);
 
-        mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(audioUrl);
-            mediaPlayer.prepareAsync(); // Prepare asynchronously to not block the UI
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Audio file error", Toast.LENGTH_SHORT).show();
-        }
-        mediaPlayer.setOnPreparedListener(mp -> {
-            seekBar.setMax(mp.getDuration());
-
-            updateSeekBar = new Runnable() {
-                @Override
-                public void run() {
-                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                        seekBar.setProgress(mediaPlayer.getCurrentPosition());
-                        handler.postDelayed(this, 500);
-                    }
-                }
-            };
-        });
-
-        playButton.setOnClickListener(v -> {
-            if (!mediaPlayer.isPlaying()) {
-                mediaPlayer.start();
-                isPlaying = true;
-                playButton.setImageResource(R.drawable.pause);
-                handler.post(updateSeekBar);
-                Toast.makeText(this, "Playing Audio", Toast.LENGTH_SHORT).show();
-            } else {
-                mediaPlayer.pause();
-                isPlaying = false;
-                playButton.setImageResource(R.drawable.play);
-                handler.removeCallbacks(updateSeekBar);
-                Toast.makeText(this, "Paused", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser && mediaPlayer != null) {
-                    mediaPlayer.seekTo(progress);
-                }
-            }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-
-
-
-        // Skip to next page
-        /*skipNext.setOnClickListener(v -> {
-            if (currentPage < totalPages - 1) {
-                currentPage++;
-                pdfView.jumpTo(currentPage, true);
-            } else {
-                Toast.makeText(this, "Last Page", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Skip to previous page
-        skipPrev.setOnClickListener(v -> {
-            if (currentPage > 0) {
-                currentPage--;
-                pdfView.jumpTo(currentPage, true);
-            } else {
-                Toast.makeText(this, "First Page", Toast.LENGTH_SHORT).show();
-            }
-        });*/
-
-
+        fetchMp3AndPlay();
 
         // Handle window insets
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -123,16 +58,69 @@ public class Paath_acitvity extends AppCompatActivity {
         });
 
     }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
+    private void mp3AudioPlayer() throws IOException {
+        new Thread(() -> {
+            try {
+                // Network operation
+                Document doc = Jsoup.connect("https://hs.sgpc.net/")
+                        .userAgent("Mozilla/5.0")
+                        .get();
+
+                Element audioElement = doc.select("audio.audio-player[src]").first();
+                String audioUrl = null;
+
+                if (audioElement != null) {
+                    audioUrl = audioElement.attr("src");
+                } else {
+                    // Fallback to Regex
+                    Pattern pattern = Pattern.compile("https://hs\\.sgpc\\.net/audiohukamnama/audio-[a-zA-Z0-9.]+\\.mp3");
+                    Matcher matcher = pattern.matcher(doc.html());
+                    if (matcher.find()) {
+                        audioUrl = matcher.group();
+                    }
+                }
+
+                String finalAudioUrl = audioUrl;
+
+                if (finalAudioUrl != null) {
+                    runOnUiThread(() -> {
+                        // Call your play function here
+                        Toast.makeText(getApplicationContext(),finalAudioUrl,Toast.LENGTH_SHORT).show();
+                    });
+                } else {
+                    runOnUiThread(() -> Toast.makeText(Paath_acitvity.this, "Audio not found", Toast.LENGTH_SHORT).show());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(Paath_acitvity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-        handler.removeCallbacks(updateSeekBar);
+        }).start();
+
+    }
+    private void fetchMp3AndPlay() {
+        new Thread(() -> {
+            try {
+                // Replace with your real Hukamnama page URL
+                Document doc = Jsoup.connect("https://hs.sgpc.net/").get();
+
+                // Find the <audio> tag and get the 'src' attribute
+                Element audioElement = doc.select("div.audio-card audio.audio-player[src]").first();
+
+                if (audioElement != null) {
+                    String audioUrl = audioElement.attr("src");
+
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, audioUrl, Toast.LENGTH_SHORT).show();
+                    });
+                } else {
+                    runOnUiThread(() -> Toast.makeText(this, "Audio link not found", Toast.LENGTH_SHORT).show());
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Error fetching audio", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
     }
 }
