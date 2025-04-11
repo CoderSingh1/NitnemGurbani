@@ -6,10 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -20,7 +18,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.airbnb.lottie.LottieDrawable;
+
 import com.github.barteksc.pdfviewer.PDFView;
 
 import org.jsoup.Jsoup;
@@ -44,8 +42,9 @@ public class Acitvity_HukamNama extends AppCompatActivity {
     PDFView pdfview;
 
     LottieAnimationView lottieLoader;
-    ImageView playButton, skipNext, skipPrev,pause;
+    ImageView playButton, skipNext, skipPrev;
 
+    //String audioUrl = "https://hs.sgpc.net/audiohukamnama/audio-67f5b8ec202106.27442149.mp3";
     SeekBar seekBar;
     MediaPlayer mediaPlayer;
     Handler handler = new Handler();
@@ -67,34 +66,31 @@ public class Acitvity_HukamNama extends AppCompatActivity {
         skipPrev = findViewById(R.id.skipprev);
         mediaPlayerLayout = findViewById(R.id.linearLayout1);
 
-       // progressBar = findViewById(R.id.progressBar);
-        // Set the visibility of the progressBar.bringToFront();
         lottieLoader.setVisibility(View.VISIBLE);
-        lottieLoader.setRepeatCount(0);
         lottieLoader.bringToFront();
+        //lottieLoader.setRepeatCount(1);
         lottieLoader.playAnimation();
 
         lottieLoader.addAnimatorListener(new Animator.AnimatorListener() {
             @Override
-            public void onAnimationStart(@NonNull Animator animation) {
-                Log.d("LottieDebug", "Animation started");
+            public void onAnimationEnd(Animator animation) {
+                Log.e("LottieDebug","Start");
+                // Fade-in the media layout
+
             }
 
-            @Override
-            public void onAnimationEnd(@NonNull Animator animation) {
-                Log.d("LottieDebug", "Animation ended");
-
-                lottieLoader.setVisibility(View.GONE); // Hide loader
-
+            @Override public void onAnimationStart(Animator animation) {
+                Log.e( "LottieDebug","End");
                 mediaPlayerLayout.setVisibility(View.VISIBLE);
                 seekBar.setAlpha(0f);
-                seekBar.animate().alpha(1f).setDuration(800).start();
+                seekBar.animate().alpha(1f).setDuration(600).start();
                 mediaPlayerLayout.setAlpha(0f);
-                mediaPlayerLayout.animate().alpha(1f).setDuration(800).start();
+                mediaPlayerLayout.animate().alpha(1f).setDuration(600).start();
             }
+            @Override public void onAnimationCancel(Animator animation) {}
+            @Override public void onAnimationRepeat(Animator animation) {
 
-            @Override public void onAnimationCancel(@NonNull Animator animation) {}
-            @Override public void onAnimationRepeat(@NonNull Animator animation) {}
+            }
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -103,8 +99,6 @@ public class Acitvity_HukamNama extends AppCompatActivity {
                     return insets;
                 });
 
-
-        //progressBar.setVisibility(ProgressBar.VISIBLE);
 
         fetchDailyPdfLink();
         fetchMp3AndPlay();
@@ -145,9 +139,10 @@ public class Acitvity_HukamNama extends AppCompatActivity {
                         }
                         outputStream.flush();
                         runOnUiThread(() -> {
-                            pdfview.fromFile(pdfFile).load();
-                           // progressBar.setVisibility(View.GONE);
-                            lottieLoader.setVisibility(View.GONE);
+                            if (!isFinishing() && !isDestroyed()) {
+                                pdfview.fromFile(pdfFile).load();
+                                lottieLoader.setVisibility(View.GONE);
+                            }
                         });
                         Log.d(TAG, "PDF downloaded and loaded successfully");
                     }
