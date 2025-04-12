@@ -32,7 +32,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     ImageView imageview;
     ImageView imageview1;
     ImageButton themeToggleBtn;

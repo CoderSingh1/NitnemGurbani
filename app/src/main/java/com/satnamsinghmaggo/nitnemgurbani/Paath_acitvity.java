@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Paath_acitvity extends AppCompatActivity {
+public class Paath_acitvity extends BaseActivity {
 
     PDFView pdfView;
     ImageView playButton, skipNext, skipPrev,pause;

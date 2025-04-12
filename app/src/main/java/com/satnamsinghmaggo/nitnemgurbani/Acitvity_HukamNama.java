@@ -41,7 +41,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class Acitvity_HukamNama extends AppCompatActivity {
+public class Acitvity_HukamNama extends BaseActivity {
 
     private static final String TAG = "Acitvity_HukamNama";
     private PDFView pdfView;
