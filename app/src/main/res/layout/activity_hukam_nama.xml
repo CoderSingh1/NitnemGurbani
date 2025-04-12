@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="?android:colorBackground"
     tools:context=".Acitvity_HukamNama">
 
     <com.airbnb.lottie.LottieAnimationView
@@ -28,6 +28,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="6dp"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,17 +79,13 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:stepSize="1"
-        android:valueFrom="0"
-        android:valueTo="100"
         android:alpha="0"
-        app:haloColor="@color/white"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:thumbColor="@color/black"
-        android:thumbTint="@color/black"
-        android:progressTint="@color/black"/>
+        android:thumbTint="@color/light"
+        android:progressTint="@color/light"/>
 
 
 
