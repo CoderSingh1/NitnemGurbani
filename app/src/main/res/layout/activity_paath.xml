@@ -5,40 +5,27 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".Acitvity_HukamNama">
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieLoader"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lottie_autoPlay="true"
-        app:lottie_fileName="Animation1.json"
-        app:lottie_loop="true"
-        app:lottie_renderMode="hardware" />
+    android:background="?android:colorBackground"
+    tools:context=".Activity_Paath">
 
     <com.github.barteksc.pdfviewer.PDFView
-        android:id="@+id/pdfview"
+        android:id="@+id/pdfview1"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="6dp"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+    </com.github.barteksc.pdfviewer.PDFView>
+
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:alpha="0"
-        android:visibility="invisible"
         android:orientation="horizontal"
         android:padding="12dp"
         android:background="@android:color/transparent"
@@ -79,17 +66,13 @@
         android:stepSize="1"
         android:valueFrom="0"
         android:valueTo="100"
-        android:alpha="0"
-        app:haloColor="@color/white"
+        app:haloColor="@color/light"
+        android:thumbTint="@color/dark"
+        android:progressTint="@color/dark"
         android:background="@android:color/transparent"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout1"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:thumbColor="@color/black"
-        android:thumbTint="@color/black"
-        android:progressTint="@color/black"/>
-
-
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
