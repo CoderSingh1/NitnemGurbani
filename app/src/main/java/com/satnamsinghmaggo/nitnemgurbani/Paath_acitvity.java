@@ -1,18 +1,25 @@
 package com.satnamsinghmaggo.nitnemgurbani;
 
+import android.animation.Animator;
+import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.google.android.material.slider.Slider;
 
@@ -31,6 +38,9 @@ public class Paath_acitvity extends AppCompatActivity {
     SeekBar seekBar;
     Handler handler = new Handler();
     Runnable updateSeekBar;
+    LottieAnimationView lottieLoader;
+    LinearLayout mediaPlayerLayout;
+    MediaPlayer mediaPlayer;
     String audioUrl = "https://hs.sgpc.net/audiohukamnama/audio-67f5b8ec202106.27442149.mp3";
 
     private boolean isPlaying = false;
@@ -46,9 +56,13 @@ public class Paath_acitvity extends AppCompatActivity {
         skipNext = findViewById(R.id.skipnext);
         skipPrev = findViewById(R.id.skipprev);
         seekBar = findViewById(R.id.seekBar);
+        mediaPlayerLayout = findViewById(R.id.linearLayout);
         //pause = findViewById(R.drawable.pause);
-
-        fetchMp3AndPlay();
+        lottieLoader = findViewById(R.id.lottieLoader1);
+        applyControlIconTint();
+        setupLottieAnimation();
+        loadLocalPdf();
+        setupAudioPlayer();
 
         // Handle window insets
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -58,69 +72,107 @@ public class Paath_acitvity extends AppCompatActivity {
         });
 
     }
-    private void mp3AudioPlayer() throws IOException {
-        new Thread(() -> {
-            try {
-                // Network operation
-                Document doc = Jsoup.connect("https://hs.sgpc.net/")
-                        .userAgent("Mozilla/5.0")
-                        .get();
 
-                Element audioElement = doc.select("audio.audio-player[src]").first();
-                String audioUrl = null;
+    private void setupAudioPlayer() {
+        mediaPlayer = MediaPlayer.create(this, R.raw.japji_sahib);
+        seekBar.setMax(mediaPlayer.getDuration());
 
-                if (audioElement != null) {
-                    audioUrl = audioElement.attr("src");
-                } else {
-                    // Fallback to Regex
-                    Pattern pattern = Pattern.compile("https://hs\\.sgpc\\.net/audiohukamnama/audio-[a-zA-Z0-9.]+\\.mp3");
-                    Matcher matcher = pattern.matcher(doc.html());
-                    if (matcher.find()) {
-                        audioUrl = matcher.group();
-                    }
+        updateSeekBar = new Runnable() {
+            @Override
+            public void run() {
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    seekBar.setProgress(mediaPlayer.getCurrentPosition());
+                    handler.postDelayed(this, 500);
                 }
-
-                String finalAudioUrl = audioUrl;
-
-                if (finalAudioUrl != null) {
-                    runOnUiThread(() -> {
-                        // Call your play function here
-                        Toast.makeText(getApplicationContext(),finalAudioUrl,Toast.LENGTH_SHORT).show();
-                    });
-                } else {
-                    runOnUiThread(() -> Toast.makeText(Paath_acitvity.this, "Audio not found", Toast.LENGTH_SHORT).show());
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(Paath_acitvity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
-        }).start();
+        };
+
+        playButton.setOnClickListener(v -> {
+            if (!mediaPlayer.isPlaying()) {
+                mediaPlayer.start();
+                playButton.setImageResource(R.drawable.pause);
+                handler.post(updateSeekBar);
+            } else {
+                mediaPlayer.pause();
+                playButton.setImageResource(R.drawable.play);
+                handler.removeCallbacks(updateSeekBar);
+            }
+        });
+
+        skipNext.setOnClickListener(v -> {
+            int pos = mediaPlayer.getCurrentPosition() + 5000;
+            mediaPlayer.seekTo(Math.min(pos, mediaPlayer.getDuration()));
+        });
+
+        skipPrev.setOnClickListener(v -> {
+            int pos = mediaPlayer.getCurrentPosition() - 5000;
+            mediaPlayer.seekTo(Math.max(pos, 0));
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) mediaPlayer.seekTo(progress);
+            }
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+    }
+
+    private void loadLocalPdf() {
+        pdfView.fromAsset("Japji[Gurmukhi].pdf")
+                .onLoad(nbPages -> {
+                    // PDF loaded, stop and hide loader
+                    if (lottieLoader != null) {
+                        lottieLoader.cancelAnimation();
+                        lottieLoader.setVisibility(View.GONE);
+                    }
+
+                    // Show media controls with animation
+                    mediaPlayerLayout.setVisibility(View.VISIBLE);
+                    seekBar.setAlpha(0f);
+                    seekBar.animate().alpha(1f).setDuration(600).start();
+                    mediaPlayerLayout.setAlpha(0f);
+                    mediaPlayerLayout.animate().alpha(1f).setDuration(600).start();
+                })
+                .onError(t -> {
+                    Toast.makeText(this, "Failed to load PDF", Toast.LENGTH_SHORT).show();
+                    if (lottieLoader != null) {
+                        lottieLoader.cancelAnimation();
+                        lottieLoader.setVisibility(View.GONE);
+                    }
+                })
+                .load();
 
     }
-    private void fetchMp3AndPlay() {
-        new Thread(() -> {
-            try {
-                // Replace with your real Hukamnama page URL
-                Document doc = Jsoup.connect("https://hs.sgpc.net/").get();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            if (mediaPlayer.isPlaying()) mediaPlayer.stop();
+            mediaPlayer.release();
+        }
+        handler.removeCallbacks(updateSeekBar);
+    }
+    private void setupLottieAnimation() {
+        lottieLoader.setVisibility(View.VISIBLE);
+        lottieLoader.bringToFront();
+        lottieLoader.playAnimation();
+    }
+    private void applyControlIconTint() {
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(androidx.appcompat.R.attr.colorControlNormal, typedValue, true);
 
-                // Find the <audio> tag and get the 'src' attribute
-                Element audioElement = doc.select("div.audio-card audio.audio-player[src]").first();
+        int color;
+        if (typedValue.resourceId != 0) {
+            color = ContextCompat.getColor(this, typedValue.resourceId);
+        } else {
+            color = typedValue.data;
+        }
 
-                if (audioElement != null) {
-                    String audioUrl = audioElement.attr("src");
-
-                    runOnUiThread(() -> {
-                        Toast.makeText(this, audioUrl, Toast.LENGTH_SHORT).show();
-                    });
-                } else {
-                    runOnUiThread(() -> Toast.makeText(this, "Audio link not found", Toast.LENGTH_SHORT).show());
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(this, "Error fetching audio", Toast.LENGTH_SHORT).show());
-            }
-        }).start();
+        playButton.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        skipNext.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        skipPrev.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        seekBar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        seekBar.getThumb().setColorFilter(color, PorterDuff.Mode.SRC_IN);
     }
 }

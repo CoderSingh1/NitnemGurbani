@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E4A137"
+    android:background="?android:colorBackground"
     tools:context=".MainActivity">
 
         <Toolbar
@@ -14,7 +14,8 @@
             android:layout_height="wrap_content"
             android:background="#3A48C0"
             android:title="Nitnem Gurbani"
-            android:titleTextColor="@color/white"
+            android:titleTextColor="@color/light"
+            android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -38,6 +39,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/themeToggleBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_circle_grey"
+            android:elevation="6dp"
+            android:contentDescription="Toggle theme"
+            android:padding="8dp"
+            android:src="@drawable/dark_mode"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/PaathIMG" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

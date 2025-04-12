@@ -1,10 +1,12 @@
 package com.satnamsinghmaggo.nitnemgurbani;
 
 import android.animation.Animator;
+import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -13,12 +15,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
-
 import com.github.barteksc.pdfviewer.PDFView;
 
 import org.jsoup.Jsoup;
@@ -39,17 +41,14 @@ import okhttp3.Response;
 public class Acitvity_HukamNama extends AppCompatActivity {
 
     private static final String TAG = "Acitvity_HukamNama";
-    PDFView pdfview;
-
-    LottieAnimationView lottieLoader;
-    ImageView playButton, skipNext, skipPrev;
-
-    //String audioUrl = "https://hs.sgpc.net/audiohukamnama/audio-67f5b8ec202106.27442149.mp3";
-    SeekBar seekBar;
-    MediaPlayer mediaPlayer;
-    Handler handler = new Handler();
-    Runnable updateSeekBar;
-    LinearLayout mediaPlayerLayout;
+    private PDFView pdfView;
+    private LottieAnimationView lottieLoader;
+    private ImageView playButton, skipNext, skipPrev;
+    private SeekBar seekBar;
+    private MediaPlayer mediaPlayer;
+    private Handler handler = new Handler();
+    private Runnable updateSeekBar;
+    private LinearLayout mediaPlayerLayout;
     private boolean isPlaying = false;
     private static final OkHttpClient client = new OkHttpClient();
 
@@ -58,78 +57,86 @@ public class Acitvity_HukamNama extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acitvity_hukam_nama);
 
-        pdfview = findViewById(R.id.pdfview);
+        initViews();
+        applyControlIconTint();
+        setupLottieAnimation();
+        applyWindowInsets();
+
+        fetchDailyPdfLink();
+        fetchMp3AndPlay();
+    }
+
+    private void initViews() {
+        pdfView = findViewById(R.id.pdfview);
         lottieLoader = findViewById(R.id.lottieLoader);
         seekBar = findViewById(R.id.seekBar);
         playButton = findViewById(R.id.play);
         skipNext = findViewById(R.id.skipnext);
         skipPrev = findViewById(R.id.skipprev);
         mediaPlayerLayout = findViewById(R.id.linearLayout1);
+    }
 
+    private void setupLottieAnimation() {
         lottieLoader.setVisibility(View.VISIBLE);
         lottieLoader.bringToFront();
-        //lottieLoader.setRepeatCount(1);
         lottieLoader.playAnimation();
 
         lottieLoader.addAnimatorListener(new Animator.AnimatorListener() {
             @Override
-            public void onAnimationEnd(Animator animation) {
-                Log.e("LottieDebug","Start");
-                // Fade-in the media layout
-
-            }
-
-            @Override public void onAnimationStart(Animator animation) {
-                Log.e( "LottieDebug","End");
+            public void onAnimationStart(@NonNull Animator animation) {
                 mediaPlayerLayout.setVisibility(View.VISIBLE);
                 seekBar.setAlpha(0f);
                 seekBar.animate().alpha(1f).setDuration(600).start();
                 mediaPlayerLayout.setAlpha(0f);
                 mediaPlayerLayout.animate().alpha(1f).setDuration(600).start();
             }
-            @Override public void onAnimationCancel(Animator animation) {}
-            @Override public void onAnimationRepeat(Animator animation) {
 
-            }
+            @Override public void onAnimationEnd(@NonNull Animator animation) {}
+            @Override public void onAnimationCancel(@NonNull Animator animation) {}
+            @Override public void onAnimationRepeat(@NonNull Animator animation) {}
         });
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-                    Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-                    v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-                    return insets;
-                });
-
-
-        fetchDailyPdfLink();
-        fetchMp3AndPlay();
-        //downloadAndDisplayPdf(pdfURL);
-        Log.d(TAG, "Views initialized successfully");
     }
 
+    private void applyWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+
+    private void fetchDailyPdfLink() {
+        new Thread(() -> {
+            try {
+                Document doc = Jsoup.connect("https://hs.sgpc.net/").get();
+                Element link = doc.select("div.pdf-section a.pdf-button[href]").first();
+                if (link != null) {
+                    String pdfUrl = "https://hs.sgpc.net/" + link.attr("href");
+                    runOnUiThread(() -> downloadAndDisplayPdf(pdfUrl));
+                } else {
+                    showToast("No PDF link found");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                showToast("Error fetching PDF link");
+            }
+        }).start();
+    }
 
     private void downloadAndDisplayPdf(String url) {
         Request request = new Request.Builder().url(url).build();
-        Log.d(TAG, "Downloading PDF started");
-
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 e.printStackTrace();
-                Log.d(TAG, "Downloading failed");
-                runOnUiThread(() -> {
-                    Toast.makeText(Acitvity_HukamNama.this, "Failed to download PDF", Toast.LENGTH_SHORT).show();
-                    //progressBar.setVisibility(View.GONE);
-                    lottieLoader.setVisibility(View.GONE);
-
-                });
+                showToast("Failed to download PDF");
+                hideLoader();
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     File pdfFile = new File(getCacheDir(), "downloaded.pdf");
-                    assert response.body() != null;
                     try (InputStream inputStream = response.body().byteStream();
                          FileOutputStream outputStream = new FileOutputStream(pdfFile)) {
                         byte[] buffer = new byte[4096];
@@ -137,70 +144,50 @@ public class Acitvity_HukamNama extends AppCompatActivity {
                         while ((bytesRead = inputStream.read(buffer)) != -1) {
                             outputStream.write(buffer, 0, bytesRead);
                         }
-                        outputStream.flush();
                         runOnUiThread(() -> {
-                            if (!isFinishing() && !isDestroyed()) {
-                                pdfview.fromFile(pdfFile).load();
-                                lottieLoader.setVisibility(View.GONE);
-                            }
+                            pdfView.fromFile(pdfFile).load();
+                            hideLoader();
                         });
-                        Log.d(TAG, "PDF downloaded and loaded successfully");
                     }
                 } else {
-                    runOnUiThread(() -> {
-                        Toast.makeText(Acitvity_HukamNama.this, "Failed to download PDF", Toast.LENGTH_SHORT).show();
-                       // progressBar.setVisibility(View.GONE);
-                        lottieLoader.setVisibility(View.GONE);
-                    });
+                    showToast("Failed to download PDF");
+                    hideLoader();
                 }
             }
         });
     }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-            }
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-        handler.removeCallbacks(updateSeekBar);
-    }
-    private void fetchDailyPdfLink() {
+
+    private void fetchMp3AndPlay() {
         new Thread(() -> {
             try {
                 Document doc = Jsoup.connect("https://hs.sgpc.net/").get();
-                Element link = doc.select("div.pdf-section a.pdf-button[href]").first(); // Or a more specific selector
-                if (link != null) {
-                    String relativeUrl = link.attr("href");
-                    String pdfUrl = "https://hs.sgpc.net/" + relativeUrl;
-                    runOnUiThread(() -> downloadAndDisplayPdf(pdfUrl));
-
+                Element audioElement = doc.select("div.audio-card audio.audio-player[src]").first();
+                if (audioElement != null) {
+                    String audioUrl = audioElement.attr("src");
+                    runOnUiThread(() -> initializeMediaPlayer(audioUrl));
                 } else {
-                    runOnUiThread(() ->
-                            Toast.makeText(this, "No PDF link found", Toast.LENGTH_SHORT).show());
+                    showToast("Audio link not found");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                runOnUiThread(() ->
-                        Toast.makeText(this, "Error fetching PDF link", Toast.LENGTH_SHORT).show());
+                showToast("Error fetching audio");
             }
         }).start();
     }
-    private void mp3AudioPlayer(String audioUrl){
+
+    private void initializeMediaPlayer(String audioUrl) {
         mediaPlayer = new MediaPlayer();
         try {
             mediaPlayer.setDataSource(audioUrl);
-            mediaPlayer.prepareAsync(); // Prepare asynchronously to not block the UI
+            mediaPlayer.prepareAsync();
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Audio file error", Toast.LENGTH_SHORT).show();
+            showToast("Audio file error");
+            return;
         }
+
         mediaPlayer.setOnPreparedListener(mp -> {
             seekBar.setMax(mp.getDuration());
-
             updateSeekBar = new Runnable() {
                 @Override
                 public void run() {
@@ -211,48 +198,10 @@ public class Acitvity_HukamNama extends AppCompatActivity {
                 }
             };
         });
-        playButton.setOnClickListener(v -> {
-            if (!mediaPlayer.isPlaying()) {
-                mediaPlayer.start();
-                isPlaying = true;
-                playButton.setImageResource(R.drawable.pause);
-                handler.post(updateSeekBar);
-                Toast.makeText(this, "Playing Audio", Toast.LENGTH_SHORT).show();
-            } else {
-                mediaPlayer.pause();
-                isPlaying = false;
-                playButton.setImageResource(R.drawable.play);
-                handler.removeCallbacks(updateSeekBar);
-                Toast.makeText(this, "Paused", Toast.LENGTH_SHORT).show();
-            }
-        });
 
-        skipNext.setOnClickListener(v -> {
-            if (mediaPlayer != null) {
-                int currentPosition = mediaPlayer.getCurrentPosition();
-                int duration = mediaPlayer.getDuration();
-                int forwardTime = 5000;
-
-                if (currentPosition + forwardTime <= duration) {
-                    mediaPlayer.seekTo(currentPosition + forwardTime);
-                } else {
-                    mediaPlayer.seekTo(duration); // go to end if within last 5s
-                }
-            }
-        });
-
-        skipPrev.setOnClickListener(v -> {
-                    if (mediaPlayer != null) {
-                        int currentPosition = mediaPlayer.getCurrentPosition();
-                        int backwardTime = 5000;
-
-                        if (currentPosition - backwardTime >= 0) {
-                            mediaPlayer.seekTo(currentPosition - backwardTime);
-                        } else {
-                            mediaPlayer.seekTo(0); // go to start if less than 5s
-                        }
-                    }
-                });
+        playButton.setOnClickListener(v -> togglePlayback());
+        skipNext.setOnClickListener(v -> seekBy(5000));
+        skipPrev.setOnClickListener(v -> seekBy(-5000));
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -263,30 +212,68 @@ public class Acitvity_HukamNama extends AppCompatActivity {
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });
-
-
     }
-    private void fetchMp3AndPlay() {
-        new Thread(() -> {
-            try {
-                // Replace with your real Hukamnama page URL
-                Document doc = Jsoup.connect("https://hs.sgpc.net/").get();
 
-                // Find the <audio> tag and get the 'src' attribute
-                Element audioElement = doc.select("div.audio-card audio.audio-player[src]").first();
-
-                if (audioElement != null) {
-                    String audioUrl = audioElement.attr("src");
-
-                    runOnUiThread(() -> mp3AudioPlayer(audioUrl));
-                } else {
-                    runOnUiThread(() -> Toast.makeText(this, "Audio link not found", Toast.LENGTH_SHORT).show());
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(this, "Error fetching audio", Toast.LENGTH_SHORT).show());
+    private void togglePlayback() {
+        if (mediaPlayer != null) {
+            if (!mediaPlayer.isPlaying()) {
+                mediaPlayer.start();
+                isPlaying = true;
+                playButton.setImageResource(R.drawable.pause);
+                handler.post(updateSeekBar);
+                showToast("Playing Audio");
+            } else {
+                mediaPlayer.pause();
+                isPlaying = false;
+                playButton.setImageResource(R.drawable.play);
+                handler.removeCallbacks(updateSeekBar);
+                showToast("Paused");
             }
-        }).start();
+        }
+    }
+
+    private void seekBy(int milliseconds) {
+        if (mediaPlayer != null) {
+            int newPosition = mediaPlayer.getCurrentPosition() + milliseconds;
+            newPosition = Math.max(0, Math.min(newPosition, mediaPlayer.getDuration()));
+            mediaPlayer.seekTo(newPosition);
+        }
+    }
+
+    private void showToast(String message) {
+        runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
+    }
+
+    private void hideLoader() {
+        runOnUiThread(() -> lottieLoader.setVisibility(View.GONE));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            if (mediaPlayer.isPlaying()) mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+        handler.removeCallbacks(updateSeekBar);
+    }
+    private void applyControlIconTint() {
+        TypedValue typedValue = new TypedValue();
+        // Use your app's theme attribute instead of androidx.appcompat
+        getTheme().resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true);
+
+        int color;
+        if (typedValue.resourceId != 0) {
+            color = ContextCompat.getColor(this, typedValue.resourceId);
+        } else {
+            color = typedValue.data;
+        }
+
+        playButton.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        skipNext.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        skipPrev.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        seekBar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        seekBar.getThumb().setColorFilter(color, PorterDuff.Mode.SRC_IN);
     }
 }

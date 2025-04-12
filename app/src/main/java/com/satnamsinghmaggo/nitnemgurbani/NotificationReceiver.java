@@ -14,22 +14,17 @@ import androidx.core.content.ContextCompat;
 public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("AlarmDebug", "Alarm received!");
+        String title = intent.getStringExtra("title");
+        String message = intent.getStringExtra("message");
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "daily_channel")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("Nitnem Reminder")
-                .setContentText("Waheguru Ji Ka Khalsa 🙏🏻")
+                .setSmallIcon(R.drawable.ic_notification) // your icon here
+                .setContentTitle(title)
+                .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true);
 
         NotificationManagerCompat manager = NotificationManagerCompat.from(context);
-        if (android.os.Build.VERSION.SDK_INT < 33 ||
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
-                        == PackageManager.PERMISSION_GRANTED) {
-            manager.notify(101, builder.build());
-        } else {
-            Log.e("AlarmDebug", "Notification permission not granted");
-        }
+        manager.notify((int) System.currentTimeMillis(), builder.build());
     }
 }
