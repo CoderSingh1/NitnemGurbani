@@ -1,7 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.NitnemGurbani" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.NitnemGurbani" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
+        <item name="colorPrimary">#FF6200EE</item>
+        <item name="colorPrimaryVariant">#FF3700B3</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorBackground">#121212</item>
+        <item name="colorControlNormal">#FFFFFF</item> <!-- white for icons on dark bg -->
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
     </style>
 </resources>
