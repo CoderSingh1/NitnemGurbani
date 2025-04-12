@@ -1,7 +1,10 @@
 package com.satnamsinghmaggo.nitnemgurbani;
 
 import android.animation.Animator;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -55,7 +58,7 @@ public class Acitvity_HukamNama extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_acitvity_hukam_nama);
+        setContentView(R.layout.activity_hukam_nama);
 
         initViews();
         applyControlIconTint();
@@ -79,6 +82,18 @@ public class Acitvity_HukamNama extends AppCompatActivity {
     private void setupLottieAnimation() {
         lottieLoader.setVisibility(View.VISIBLE);
         lottieLoader.bringToFront();
+
+        lottieLoader.setAnimation("Animation1.json");
+
+        if (isDarkModeEnabled()) {
+            // This applies white tint to all paths and strokes
+            lottieLoader.addValueCallback(
+                    new com.airbnb.lottie.model.KeyPath("**"),
+                    com.airbnb.lottie.LottieProperty.COLOR_FILTER,
+                    frame -> new PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP)
+            );
+        }
+
         lottieLoader.playAnimation();
 
         lottieLoader.addAnimatorListener(new Animator.AnimatorListener() {
@@ -276,4 +291,9 @@ public class Acitvity_HukamNama extends AppCompatActivity {
         seekBar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
         seekBar.getThumb().setColorFilter(color, PorterDuff.Mode.SRC_IN);
     }
+    private boolean isDarkModeEnabled() {
+        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
+    }
+
 }

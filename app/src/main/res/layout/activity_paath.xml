@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:colorBackground"
-    tools:context=".Activity_Paath">
+    tools:context=".Paath_acitvity">
 
     <com.github.barteksc.pdfviewer.PDFView
         android:id="@+id/pdfview1"

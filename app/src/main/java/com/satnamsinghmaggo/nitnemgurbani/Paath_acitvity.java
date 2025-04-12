@@ -49,7 +49,7 @@ public class Paath_acitvity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_paath_acitvity);
+        setContentView(R.layout.activity_paath);
 
         pdfView = findViewById(R.id.pdfview1);
         playButton = findViewById(R.id.play);
@@ -58,9 +58,9 @@ public class Paath_acitvity extends AppCompatActivity {
         seekBar = findViewById(R.id.seekBar);
         mediaPlayerLayout = findViewById(R.id.linearLayout);
         //pause = findViewById(R.drawable.pause);
-        lottieLoader = findViewById(R.id.lottieLoader1);
+       // lottieLoader = findViewById(R.id.lottieLoader1);
         applyControlIconTint();
-        setupLottieAnimation();
+      //  setupLottieAnimation();
         loadLocalPdf();
         setupAudioPlayer();
 
@@ -120,6 +120,7 @@ public class Paath_acitvity extends AppCompatActivity {
 
     private void loadLocalPdf() {
         pdfView.fromAsset("Japji[Gurmukhi].pdf")
+                .enableAntialiasing(true)
                 .onLoad(nbPages -> {
                     // PDF loaded, stop and hide loader
                     if (lottieLoader != null) {
