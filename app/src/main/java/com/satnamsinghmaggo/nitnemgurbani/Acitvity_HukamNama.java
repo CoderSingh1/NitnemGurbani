@@ -8,16 +8,15 @@ import android.graphics.PorterDuffColorFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -54,6 +53,7 @@ public class Acitvity_HukamNama extends BaseActivity {
     private LinearLayout mediaPlayerLayout;
     private boolean isPlaying = false;
     private static final OkHttpClient client = new OkHttpClient();
+    private TextView gurmukhiTitle, gurmukhiText, punjabiTranslation, punjabiText, englishTranslation, englishText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,19 +64,25 @@ public class Acitvity_HukamNama extends BaseActivity {
         applyControlIconTint();
         setupLottieAnimation();
         applyWindowInsets();
-
-        fetchDailyPdfLink();
+        fetchAndDisplayHukamnama();
+        //fetchDailyPdfLink();
         fetchMp3AndPlay();
     }
 
     private void initViews() {
-        pdfView = findViewById(R.id.pdfview);
+       // pdfView = findViewById(R.id.pdfview);
         lottieLoader = findViewById(R.id.lottieLoader);
         seekBar = findViewById(R.id.seekBar);
         playButton = findViewById(R.id.play);
         skipNext = findViewById(R.id.skipnext);
         skipPrev = findViewById(R.id.skipprev);
         mediaPlayerLayout = findViewById(R.id.linearLayout1);
+        gurmukhiTitle = findViewById(R.id.gurmukhiTitle);
+        gurmukhiText = findViewById(R.id.gurmukhiText);
+        punjabiTranslation = findViewById(R.id.punjabiTranslation);
+        punjabiText = findViewById(R.id.punjabiText);
+        englishTranslation = findViewById(R.id.englishTranslation);
+        englishText = findViewById(R.id.englishText);
     }
 
     private void setupLottieAnimation() {
@@ -294,6 +300,39 @@ public class Acitvity_HukamNama extends BaseActivity {
     private boolean isDarkModeEnabled() {
         int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES;
+    }
+    private void fetchAndDisplayHukamnama() {
+        new Thread(() -> {
+            try {
+                Document doc = Jsoup.connect("https://hs.sgpc.net/").get();
+
+                // Gurmukhi Title & Text
+                Element title = doc.selectFirst("div.hukamnama-card h4.hukamnama-title");
+                Element hukamText = doc.selectFirst("div.hukamnama-card p.hukamnama-text");
+
+                // Punjabi Explanation
+                Element punjabiTitle = doc.selectFirst("div.hukamnama-card2 h4.hukamnama-title");
+                Element punjabiBody = doc.select("div.hukamnama-card2").get(0).selectFirst("p.hukamnama-text");
+
+                // English Translation
+                Element englishTitle = doc.select("div.hukamnama-card2").get(1).selectFirst("h4.hukamnama-title");
+                Element englishBody = doc.select("div.hukamnama-card2").get(1).selectFirst("p.hukamnama-text");
+
+                runOnUiThread(() -> {
+                    lottieLoader.setVisibility(View.GONE);
+                    if (title != null) gurmukhiTitle.setText(title.text());
+                    if (hukamText != null) gurmukhiText.setText(hukamText.text());
+                    if (punjabiTitle != null) punjabiTranslation.setText(punjabiTitle.text());
+                    if (punjabiBody != null) punjabiText.setText(punjabiBody.text());
+                    if (englishTitle != null) englishTranslation.setText(englishTitle.text());
+                    if (englishBody != null) englishText.setText(englishBody.text());
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Failed to load Hukamnama", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
     }
 
 }

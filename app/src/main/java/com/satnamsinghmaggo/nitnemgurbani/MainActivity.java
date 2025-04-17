@@ -16,13 +16,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresPermission;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -43,11 +41,10 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         imageview = findViewById(R.id.HukamNamaIMG);
         imageview1 = findViewById(R.id.PaathIMG);
-        GlobalLoader.preloadAnimation(this, "Animation1.json");
+      //  GlobalLoader.preloadAnimation(this, "Animation1.json");
         themeToggleBtn = findViewById(R.id.themeToggleBtn);
 
         SharedPreferences prefs = getSharedPreferences("theme_prefs", MODE_PRIVATE);
