@@ -10,9 +10,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +45,10 @@ import okhttp3.Response;
 
 public class Acitvity_HukamNama extends BaseActivity {
 
+    public enum FontSizeLevel {
+        SMALL, MEDIUM, LARGE
+    }
+
     private static final String TAG = "Acitvity_HukamNama";
     private PDFView pdfView;
     private LottieAnimationView lottieLoader;
@@ -53,6 +60,7 @@ public class Acitvity_HukamNama extends BaseActivity {
     private LinearLayout mediaPlayerLayout;
     private boolean isPlaying = false;
     private static final OkHttpClient client = new OkHttpClient();
+    Spinner fontSizeSpinner;
     private TextView gurmukhiTitle, gurmukhiText, punjabiTranslation, punjabiText, englishTranslation, englishText;
 
     @Override
@@ -61,6 +69,32 @@ public class Acitvity_HukamNama extends BaseActivity {
         setContentView(R.layout.activity_hukam_nama);
 
         initViews();
+        fontSizeSpinner.bringToFront();
+        String[] sizes = {"Small", "Medium", "Large"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, sizes);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        fontSizeSpinner.setAdapter(adapter);
+        fontSizeSpinner.setSelection(1); // Medium
+        fontSizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                FontSizeLevel selectedSize;
+                switch (position) {
+                    case 0: selectedSize = FontSizeLevel.SMALL; break;
+                    case 1: selectedSize = FontSizeLevel.MEDIUM; break;
+                    case 2: selectedSize = FontSizeLevel.LARGE; break;
+                    default: selectedSize = FontSizeLevel.MEDIUM;
+                }
+                applyFontSize(selectedSize);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
+
+
+
         applyControlIconTint();
         setupLottieAnimation();
         applyWindowInsets();
@@ -68,6 +102,7 @@ public class Acitvity_HukamNama extends BaseActivity {
         //fetchDailyPdfLink();
         fetchMp3AndPlay();
     }
+
 
     private void initViews() {
        // pdfView = findViewById(R.id.pdfview);
@@ -83,6 +118,8 @@ public class Acitvity_HukamNama extends BaseActivity {
         punjabiText = findViewById(R.id.punjabiText);
         englishTranslation = findViewById(R.id.englishTranslation);
         englishText = findViewById(R.id.englishText);
+
+        fontSizeSpinner = findViewById(R.id.fontSizeSpinner);
     }
 
     private void setupLottieAnimation() {
@@ -333,6 +370,36 @@ public class Acitvity_HukamNama extends BaseActivity {
                 runOnUiThread(() -> Toast.makeText(this, "Failed to load Hukamnama", Toast.LENGTH_SHORT).show());
             }
         }).start();
+    }
+    private void applyFontSize(FontSizeLevel level) {
+        float sizeSp;
+        switch (level) {
+            case SMALL:
+                sizeSp = 14f;
+                break;
+            case MEDIUM:
+                sizeSp = 18f;
+                break;
+            case LARGE:
+                sizeSp = 22f;
+                break;
+            default:
+                sizeSp = 18f;
+        }
+
+        TextView gurmukhiTitle = findViewById(R.id.gurmukhiTitle);
+        TextView gurmukhiText = findViewById(R.id.gurmukhiText);
+        TextView punjabiTranslation = findViewById(R.id.punjabiTranslation);
+        TextView punjabiText = findViewById(R.id.punjabiText);
+        TextView englishTranslation = findViewById(R.id.englishTranslation);
+        TextView englishText = findViewById(R.id.englishText);
+
+        gurmukhiTitle.setTextSize(sizeSp);
+        gurmukhiText.setTextSize(sizeSp);
+        punjabiTranslation.setTextSize(sizeSp);
+        punjabiText.setTextSize(sizeSp);
+        englishTranslation.setTextSize(sizeSp);
+        englishText.setTextSize(sizeSp);
     }
 
 }
