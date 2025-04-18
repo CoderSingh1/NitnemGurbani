@@ -3,6 +3,7 @@ package com.satnamsinghmaggo.nitnemgurbani;
 import android.animation.Animator;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.media.MediaPlayer;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -61,7 +63,7 @@ public class Acitvity_HukamNama extends BaseActivity {
     private boolean isPlaying = false;
     private static final OkHttpClient client = new OkHttpClient();
     Spinner fontSizeSpinner;
-    private TextView gurmukhiTitle, gurmukhiText, punjabiTranslation, punjabiText, englishTranslation, englishText;
+    private TextView gurmukhiTitle, gurmukhiText, punjabiTranslation, punjabiText, englishTranslation, englishText, Maintitle1, MainTitle2, PunjabiDate, PunjabiAng, EnglishDate, EnglishAng, NormalDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,7 @@ public class Acitvity_HukamNama extends BaseActivity {
         setContentView(R.layout.activity_hukam_nama);
 
         initViews();
+
         fontSizeSpinner.bringToFront();
         String[] sizes = {"Small", "Medium", "Large"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, sizes);
@@ -118,6 +121,13 @@ public class Acitvity_HukamNama extends BaseActivity {
         punjabiText = findViewById(R.id.punjabiText);
         englishTranslation = findViewById(R.id.englishTranslation);
         englishText = findViewById(R.id.englishText);
+        Maintitle1 = findViewById(R.id.mainTitle1);
+        MainTitle2 = findViewById(R.id.mainTitle2);
+        PunjabiDate = findViewById(R.id.punjabiDate);
+        PunjabiAng = findViewById(R.id.punjabiAng);
+        EnglishDate = findViewById(R.id.englishDate);
+        EnglishAng = findViewById(R.id.englishAng);
+        NormalDate = findViewById(R.id.normalDate);
 
         fontSizeSpinner = findViewById(R.id.fontSizeSpinner);
     }
@@ -343,9 +353,22 @@ public class Acitvity_HukamNama extends BaseActivity {
             try {
                 Document doc = Jsoup.connect("https://hs.sgpc.net/").get();
 
+
+                // mukhwak sri harminder sahib heading
+                Element mainTitle1 = doc.selectFirst("div.text-center h2.hukamnama-title:nth-of-type(1)");
+                Element mainTitle2 = doc.selectFirst("div.text-center h2.hukamnama-title:nth-of-type(2)");
+
+                Element normalDate = doc.select("p.customDate strong").get(0);
+
                 // Gurmukhi Title & Text
                 Element title = doc.selectFirst("div.hukamnama-card h4.hukamnama-title");
                 Element hukamText = doc.selectFirst("div.hukamnama-card p.hukamnama-text");
+
+
+                Element punjabiDate = doc.select("p.customDate strong").get(1);
+                Element punjabiAng = doc.select("p.customDate strong").get(2);
+
+
 
                 // Punjabi Explanation
                 Element punjabiTitle = doc.selectFirst("div.hukamnama-card2 h4.hukamnama-title");
@@ -355,14 +378,32 @@ public class Acitvity_HukamNama extends BaseActivity {
                 Element englishTitle = doc.select("div.hukamnama-card2").get(1).selectFirst("h4.hukamnama-title");
                 Element englishBody = doc.select("div.hukamnama-card2").get(1).selectFirst("p.hukamnama-text");
 
+                //english date and ang
+
+                Element englishDate = doc.select("p.customDate strong").get(3);
+                Element englishAng = doc.select("p.customDate strong").get(4);
+
                 runOnUiThread(() -> {
                     lottieLoader.setVisibility(View.GONE);
                     if (title != null) gurmukhiTitle.setText(title.text());
                     if (hukamText != null) gurmukhiText.setText(hukamText.text());
-                    if (punjabiTitle != null) punjabiTranslation.setText(punjabiTitle.text());
+
+                    if (punjabiTitle != null) {punjabiTranslation.setText(punjabiTitle.text());
+                    punjabiTranslation.setPaintFlags(punjabiTranslation.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);}
+
                     if (punjabiBody != null) punjabiText.setText(punjabiBody.text());
-                    if (englishTitle != null) englishTranslation.setText(englishTitle.text());
+
+                    if (englishTitle != null) {englishTranslation.setText(englishTitle.text());
+                        englishTranslation.setPaintFlags(englishTranslation.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);}
+
                     if (englishBody != null) englishText.setText(englishBody.text());
+                    if (mainTitle1 != null) Maintitle1.setText(mainTitle1.text());
+                    if (mainTitle2 != null) MainTitle2.setText(mainTitle2.text());
+                    if (punjabiDate != null) PunjabiDate.setText(punjabiDate.text());
+                    if (punjabiAng != null) PunjabiAng.setText(punjabiAng.text());
+                    if (englishDate != null) EnglishDate.setText(englishDate.text());
+                    if (englishAng != null) EnglishAng.setText(englishAng.text());
+                    if (normalDate != null) NormalDate.setText(normalDate.text());
                 });
 
             } catch (Exception e) {
@@ -400,6 +441,17 @@ public class Acitvity_HukamNama extends BaseActivity {
         punjabiText.setTextSize(sizeSp);
         englishTranslation.setTextSize(sizeSp);
         englishText.setTextSize(sizeSp);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause(); // or mediaPlayer.stop() if you want to completely stop
+            playButton.setImageResource(R.drawable.play); // update UI
+            isPlaying = false;
+            handler.removeCallbacks(updateSeekBar);
+        }
     }
 
 }

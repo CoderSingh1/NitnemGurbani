@@ -26,7 +26,7 @@
     <Spinner
         android:id="@+id/fontSizeSpinner"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_margin="16dp"
         android:spinnerMode="dropdown"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,83 +37,157 @@
         android:id="@+id/Scrollview"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/seekBar"
         android:layout_margin="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toTopOf="@+id/Scrollview"
+            android:layout_height="wrap_content"
             android:layout_margin="6dp"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/Scrollview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/gurmukhiTitle"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:padding="8dp"
-                android:gravity="center"
-                android:textColor="?android:textColorPrimary"
+                android:id="@+id/mainTitle1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mainTitle2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/normalDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/gurmukhiTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="12dp"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+
 
             <TextView
                 android:id="@+id/gurmukhiText"
-                android:textSize="18sp"
-                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:lineSpacingExtra="6dp"/>
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/punjabiDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="6dp"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/punjabiAng"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="6dp"
+                android:textSize="18sp" />
+
 
             <TextView
                 android:id="@+id/punjabiTranslation"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:gravity="center"
-                android:padding="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="16dp"/>
+                android:gravity="center"
+                android:padding="12dp"
+                android:paddingTop="16dp"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/punjabiText"
-                android:textSize="18sp"
-                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:lineSpacingExtra="6dp"/>
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/englishTranslation"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:padding="8dp"
-                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="16dp"/>
+                android:gravity="center"
+                android:padding="12dp"
+                android:paddingTop="16dp"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/englishText"
-                android:textSize="18sp"
-                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:lineSpacingExtra="6dp"/>
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/englishDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="6dp"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/englishAng"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="6dp"
+                android:textSize="18sp" />
+
 
         </LinearLayout>
 
 
     </ScrollView>
-
-
-
 
     <LinearLayout
         android:id="@+id/linearLayout1"
